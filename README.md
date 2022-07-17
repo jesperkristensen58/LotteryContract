@@ -1,7 +1,10 @@
-# LotteryContract
+# Lottery Contract
 
-A lottery contract implementation.
+A lottery contract implementation!
+A manager creates, by deploying, the contract and players can enter the game by sending ETH to the contract.
+The manager then, at some point, ends the lottery and this randomly picks a winner!
 
+----
 Test with:
 
 ```npm test```
