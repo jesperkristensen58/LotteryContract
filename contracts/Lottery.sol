@@ -15,13 +15,13 @@ contract Lottery {
         _;
     }
 
-    constructor (address _manager) {
+    constructor () {
         // The contract deployer becomes the manager
-        manager = _manager;
+        manager = msg.sender;
     }
 
-    function enter(address payable player) external payable {
-        // Enter a player into the lottery.
+    function enter() external payable {
+        // Enter a player (the caller) into the lottery.
         // This player is an address which can receive money in case they win later on.
         // Note: Does not check for duplicates (we could via a mapping though)
         // When a player enters, they need to pay an amount of eth to enter
@@ -29,22 +29,21 @@ contract Lottery {
         require(msg.value > 0, "Please enter with a finite amount of ether!");
         potSize += msg.value;
 
-        players.push(player);
+        players.push(msg.sender);
     }
 
     function pickWinner() payable external onlyManager {
         // step 1: randomly pick a player from the array
-        // TODO: replace by VRF
         require(players.length > 0, "Nobody has been entered into the lottery yet!");
 
+        // TODO: replace by VRF
         uint random_number = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty, players, potSize)));
         // step 2: convert this random number into an index into the array
         uint playerIndex = random_number % players.length;  // the winning player
 
-        // now send all the money to the winner
+        // now send all the money to the winner, but first reset the state
         address payable winner = players[playerIndex];
         uint tmpPotsize = potSize;
-
         _reset(); // reset state before transfer
 
         winner.transfer(tmpPotsize);
