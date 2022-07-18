@@ -8,6 +8,7 @@ contract Lottery {
     address private manager;  // the manager who can trigger the end-of-auction event and reset
     address payable[] private players;  // who is entered into the lottery (no need to know the amount per player)
     uint private potSize;  // the lottery pot [wei]
+    uint participation_threshold = 0.01 ether;
 
     modifier onlyManager() {
         // Restrict access to a function allowing *only* the Manager to call it
@@ -26,7 +27,7 @@ contract Lottery {
         // Note: Does not check for duplicates (we could via a mapping though)
         // When a player enters, they need to pay an amount of eth to enter
         // maybe we have a threshold to enter...
-        require(msg.value > 0, "Please enter with a finite amount of ether!");
+        require(msg.value >= participation_threshold, "Please enter with a finite amount of ether!");
         potSize += msg.value;
 
         players.push(msg.sender);
